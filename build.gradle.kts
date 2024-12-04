@@ -1,5 +1,7 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "1.9.25"
 }
 
 sourceSets {
@@ -11,5 +13,11 @@ sourceSets {
 tasks {
     wrapper {
         gradleVersion = "8.11.1"
+    }
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs += "-Xcontext-receivers"
     }
 }

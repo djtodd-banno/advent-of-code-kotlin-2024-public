@@ -1,21 +1,30 @@
+import kotlin.math.abs
+
 fun main() {
     fun part1(input: List<String>): Int {
-        return input.size
+        val (a, b) = input
+            .splitList("\\s+")
+            .applyBoth {
+                mapNotNull { it.toNullableInt() }
+                    .sorted()
+            }
+        return a.zip(b) { i, j -> abs(i - j) }.sum()
+
     }
 
     fun part2(input: List<String>): Int {
-        return input.size
+        val (a, b) = input
+            .splitList("\\s+")
+            .applyBoth {
+                mapNotNull { it.toNullableInt() }
+            }
+        return a.sumOf { it * b.count(it::equals) }
     }
 
-    // Test if implementation meets criteria from the description, like:
-    check(part1(listOf("test_input")) == 1)
-
-    // Or read a large test input from the `src/Day01_test.txt` file:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
-
-    // Read the input from the `src/Day01.txt` file.
     val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+
+    val part1 = part1(input)
+    println("Pat 1 answer: $part1 shouldEqual 1320851")
+    val part2 = part2(input)
+    println("Pat 2 answer: $part2 shouldEqual 26859182")
 }
