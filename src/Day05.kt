@@ -1,5 +1,3 @@
-import java.lang.IllegalStateException
-
 fun main() {
     fun part1(input: List<String>): Int = with(input.toDay05Data()) {
         updates.filter { it.isSortedWith(ruleSorter) }
