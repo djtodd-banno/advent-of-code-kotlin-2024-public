@@ -19,5 +19,6 @@ tasks {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs += "-Xcontext-receivers"
+        freeCompilerArgs += "-Xwhen-guards"
     }
 }
