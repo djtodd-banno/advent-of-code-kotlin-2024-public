@@ -15,7 +15,7 @@ fun main() {
 
     val input = readInput("Day04")
     println("Part 1: ${part1(input)} shouldEqual 2344")
-    println("Part 2: ${part2(input)} shouldEqual :shrug:")
+    println("Part 2: ${part2(input)} shouldEqual 1815")
 }
 
 

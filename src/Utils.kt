@@ -50,3 +50,14 @@ fun Int.cardinal(other: Int) = when (val dif = (this - other)) {
 }
 
 infix fun Int.isNotSafeDelta(other: Int) = abs(this - other) !in 1..3
+
+fun <T : Comparable<*>> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean = noneIndexed { t, i ->
+    i != 0 && comparator.compare(get(i - 1), t) > 0
+}
+
+inline fun <T> Iterable<T>.noneIndexed(predicate: (T, Int) -> Boolean): Boolean {
+    var i = 0
+    if (this is Collection && isEmpty()) return true
+    for (element in this) if (predicate(element, i++)) return false
+    return true
+}
