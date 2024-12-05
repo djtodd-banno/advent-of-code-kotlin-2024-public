@@ -44,11 +44,6 @@ fun String.toNullableInt() = try {
     null
 }
 
-fun Int.cardinal(other: Int) = when (val dif = (this - other)) {
-    0 -> 0
-    else -> dif / dif.absoluteValue
-}
-
 infix fun Int.isNotSafeDelta(other: Int) = abs(this - other) !in 1..3
 
 fun <T : Comparable<*>> List<T>.isSortedWith(comparator: Comparator<in T>): Boolean = noneIndexed { t, i ->

@@ -1,3 +1,5 @@
+import kotlin.math.sign
+
 fun main() {
     fun part1(input: List<String>): Int = input
         .map {
@@ -29,10 +31,10 @@ fun getFirstUnSafeIndex(record: List<Int>): Int? {
         val level = record[i]
         val backOne = record[i - 1]
         val backTwo = record[i - 2]
-        val cardinal = backOne.cardinal(level)
-        val prevCardinal = backTwo.cardinal(backOne)
+        val sign = (backOne - level).sign
+        val prevSign = (backTwo - backOne).sign
 
-        if (cardinal != prevCardinal) return i - 2
+        if (sign != prevSign) return i - 2
         if (level isNotSafeDelta backOne) return i
         if (backOne isNotSafeDelta backTwo) return i - 2
     }
