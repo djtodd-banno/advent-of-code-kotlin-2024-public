@@ -37,6 +37,8 @@ private data class BoardState(
     fun hasVisitedNext() = visitedTiles[nextPosition].contains(direction)
     fun hasVisited(position: Position) = visitedTiles.contains(position)
 
+    val part1Answer get() = visitedTiles.keys.size
+    val part2Answer get() = obstacleOptions.size
 }
 
 const val OUT_OF_BOUNDS = '_'
@@ -44,44 +46,49 @@ const val OBSTACLE = '#'
 const val GUARD = '^'
 const val EMPTY_TILE = '.'
 fun main() {
-    fun part1And2(input: List<String>) {
+    fun part1And2(input: List<String>) : BoardState {
         val board = input.map { it.toCharArray().toList() }
         with(board) {
             val startingPosition = board.positionOf(GUARD)
             var boardState = BoardState(startingPosition)
 
-            while (boardState.nextTile != OUT_OF_BOUNDS) {
-                boardState = boardState.updateBoard()
+            while (boardState.nextTile != OUT_OF_BOUNDS) when (boardState.nextTile) {
+                OBSTACLE -> {
+                    boardState = boardState.updateBoard(
+                        direction = boardState.direction.turn()
+                    )
+                }
 
-                when (boardState.nextTile) {
-                    OBSTACLE -> {
-                        boardState = boardState.updateBoard(
-                            direction = boardState.direction.turn()
-                        )
+                else -> {
+                    val obstruction = boardState.position stepIn boardState.direction
+                    if (obstruction != startingPosition && !boardState.hasVisited(obstruction)) {
+                        boardState = isBoardEscapable(boardState, obstruction )
                     }
-
-                    else -> {
-                        val obstruction = boardState.position stepIn boardState.direction
-                        if (obstruction != startingPosition && !boardState.hasVisited(obstruction)) {
-                            if (!isBoardEscapable(obstruction, boardState)) {
-                                boardState = boardState.copy(
-                                    obstacleOptions = boardState.obstacleOptions + obstruction
-                                )
-                            }
-                        }
-                        boardState = boardState.updateBoard(
-                            position = obstruction
-                        )
-                    }
+                    boardState = boardState.updateBoard(
+                        position = obstruction
+                    )
                 }
             }
-            println("Part 1: ${boardState.visitedTiles.keys.size} shouldEqual 4973")
-            println("Part 2 : ${boardState.obstacleOptions.size} shouldEqual 1482")
+            return boardState
         }
     }
 
+    fun part1And2ReCursive(input: List<String>) : BoardState {
+        val board = input.map { it.toCharArray().toList() }
+        with(board) {
+            val startingPosition = board.positionOf(GUARD)
+            var boardState = BoardState(startingPosition)
+            while (boardState.nextTile != OUT_OF_BOUNDS){
+                boardState = isBoardEscapable(boardState, boardState.nextPosition.takeIf { it != startingPosition } )
+            }
+
+            return boardState
+        }
+    }
     val input = readInput("Day06")
-    part1And2(input)
+    val boardState = part1And2(test_input)
+    println("Part 1: ${boardState.part1Answer} shouldEqual 4973")
+    println("Part 2 : ${boardState.part2Answer} shouldEqual 1482")
 }
 
 enum class Direction {
@@ -110,10 +117,10 @@ infix fun Position.lookIn(
 
 context(Board)
 private fun isBoardEscapable(
-    obstruction: Position?,
     initialBoardState: BoardState,
-): Boolean {
-    var boardState = initialBoardState.updateBoard()
+    obstruction: Position?,
+): BoardState {
+    var boardState = initialBoardState.copy()
     while (!boardState.hasVisitedNext() &&
         boardState.nextTile != OUT_OF_BOUNDS
     ) {
@@ -138,20 +145,28 @@ private fun isBoardEscapable(
     }
     val escaped = boardState.nextTile == OUT_OF_BOUNDS
     val reachedLoop = boardState.hasVisitedNext()
-    return !reachedLoop && escaped
+    return if ((reachedLoop || !escaped) && obstruction != null)
+        initialBoardState.copy(
+            obstacleOptions = initialBoardState.obstacleOptions + obstruction
+        ) else initialBoardState
 }
 
+context(Board)
+private fun BoardState.updateBoard(position: Position): BoardState {
+    return copy(
+        visitedTiles = visitedTiles + (position to ((visitedTiles[position] ?: emptyList()) + direction)),
+        position = position,
+        nextTile = position lookIn direction,
+        nextPosition = position stepIn direction
+    )
+}
 
 context(Board)
-private fun BoardState.updateBoard(position: Position? = null, direction: Direction? = null): BoardState {
-    val pos = position ?: this.position
-    val dir = direction ?: this.direction
-
+private fun BoardState.updateBoard(direction: Direction): BoardState {
     return copy(
-        visitedTiles = visitedTiles + (pos to ((visitedTiles[pos] ?: emptyList()) + dir)),
-        position = pos,
-        direction = dir,
-        nextTile = if (position != null || direction != null) pos lookIn dir else nextTile,
-        nextPosition = if (position != null || direction != null) pos stepIn dir else nextPosition
+        visitedTiles = visitedTiles + (position to ((visitedTiles[position] ?: emptyList()) + direction)),
+        direction = direction,
+        nextTile = position lookIn direction,
+        nextPosition = position stepIn direction
     )
 }
