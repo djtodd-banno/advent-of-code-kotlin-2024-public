@@ -4,19 +4,6 @@ typealias Board = List<List<Tile>>
 typealias Position = Pair<Int, Int>
 typealias Tile = Char
 
-val test_input = listOf(
-    "....#.....",
-    ".........#",
-    "..........",
-    "..#.......",
-    ".......#..",
-    "..........",
-    ".#..^.....",
-    "........#.",
-    "#.........",
-    "......#...",
-)
-
 private data class BoardState(
     val position: Position,
     val nextPosition: Position,
@@ -73,20 +60,8 @@ fun main() {
         }
     }
 
-    fun part1And2ReCursive(input: List<String>) : BoardState {
-        val board = input.map { it.toCharArray().toList() }
-        with(board) {
-            val startingPosition = board.positionOf(GUARD)
-            var boardState = BoardState(startingPosition)
-            while (boardState.nextTile != OUT_OF_BOUNDS){
-                boardState = isBoardEscapable(boardState, boardState.nextPosition.takeIf { it != startingPosition } )
-            }
-
-            return boardState
-        }
-    }
     val input = readInput("Day06")
-    val boardState = part1And2(test_input)
+    val boardState = part1And2(input)
     println("Part 1: ${boardState.part1Answer} shouldEqual 4973")
     println("Part 2 : ${boardState.part2Answer} shouldEqual 1482")
 }
